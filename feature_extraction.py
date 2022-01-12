@@ -22,7 +22,6 @@ train_feature, test_feature = [[] for i in range(len(trainID_list))], [[] for i 
 def add_feature(x, y, df):
     # add data not in df but in train or test
     for id in tqdm(trainID_list):
-        # print(df["Customer ID"][0], id)
         if id not in list(df["Customer ID"]): 
             tmp = [id]
             tmp.extend([np.nan for i in range(len(df.columns) - 1)])
@@ -34,24 +33,21 @@ def add_feature(x, y, df):
             df.loc[len(df)] = tmp
     # for discrete col
     str_col = []
+    # fill NaN
     for column_name in df.columns:
         if column_name == "Customer ID": continue
-        # print(column_name)
         for index in range(len(df)):
             if not df.isnull()[column_name][index]: break
         # discrete
         if isinstance(df.loc[index][column_name], str): 
-            # print(df.mode().iloc[0])
             df[column_name] = df[column_name].fillna(df.mode().loc[0][column_name])
             str_col.append(column_name)
         # continuous
         else: 
-            # print(type(df.loc[index][column_name]), column_name, df.loc[index][column_name], index)
             df[column_name] = df[column_name].fillna(df[column_name].mean())
     
     # one hot encoding
     df = pd.get_dummies(df, columns=str_col)
-    # print(df.head(5))
     # train test split
     train, test = [], []
     for index in tqdm(range(len(df))):
@@ -61,12 +57,10 @@ def add_feature(x, y, df):
             #     print(len(train))
             train.append(df.loc[index].values)
         else: test.append(df.loc[index].values)
-    # train test sort 
-    # print(len(train), len(train[0]))
 
+    # train test sort by TRAIN_IDs.csv and TEST_IDs.csv
     train, test = np.array(train), np.array(test)
     for i in range(len(train)):
-        # print(train[:, 0].shape)
         idx = train[:, 0].tolist().index(trainID_list[i])
         train[[idx, i], :] = train[[i, idx], :]
     for i in range(len(test)):
