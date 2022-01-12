@@ -1,4 +1,7 @@
+import numpy as np
 import pandas as pd
+from tqdm import tqdm, trange
+from scipy import stats
 
 demographics = pd.read_csv("data/demographics.csv")
 location = pd.read_csv("data/location.csv")
@@ -10,91 +13,81 @@ status = pd.read_csv("data/status.csv")
 train_IDs = pd.read_csv("data/Train_IDs.csv")
 test_IDs = pd.read_csv("data/Test_IDs.csv")
 
+trainID_list, testID_list = list(train_IDs["Customer ID"]), list(test_IDs["Customer ID"])
+# print(trainID_list, testID_list)
+train_feature, test_feature = [[] for i in range(len(trainID_list))], [[] for i in range(len(testID_list))]
 
-serviceDict = dict()
-serviceAverage = [0 i in range(30)]
-serviceLen = len(services)
 
-for row in services.iterrows():
-    for c in range(30):
-        if isinstance(row[c], int) or isinstance(row[c], float):
-            serviceAverage[c] += row[c]
-for i in serviceAverage:
-    i /= serviceLen + 500
+# For those df which has userID
+def add_feature(x, y, df):
+    # add data not in df but in train or test
+    for id in tqdm(trainID_list):
+        # print(df["Customer ID"][0], id)
+        if id not in list(df["Customer ID"]): 
+            tmp = [id]
+            tmp.extend([np.nan for i in range(len(df.columns) - 1)])
+            df.loc[len(df)] = tmp
+    for id in tqdm(testID_list):
+        if id not in list(df["Customer ID"]): 
+            tmp = [id]
+            tmp.extend([np.nan for i in range(len(df.columns) - 1)])
+            df.loc[len(df)] = tmp
+    # for discrete col
+    str_col = []
+    for column_name in df.columns:
+        if column_name == "Customer ID": continue
+        # print(column_name)
+        for index in range(len(df)):
+            if not df.isnull()[column_name][index]: break
+        # discrete
+        if isinstance(df.loc[index][column_name], str): 
+            # print(df.mode().iloc[0])
+            df[column_name] = df[column_name].fillna(df.mode().loc[0][column_name])
+            str_col.append(column_name)
+        # continuous
+        else: 
+            # print(type(df.loc[index][column_name]), column_name, df.loc[index][column_name], index)
+            df[column_name] = df[column_name].fillna(df[column_name].mean())
+    
+    # one hot encoding
+    df = pd.get_dummies(df, columns=str_col)
+    # print(df.head(5))
+    # train test split
+    train, test = [], []
+    for index in tqdm(range(len(df))):
+        if df.loc[index]["Customer ID"] in trainID_list: 
+            # if df.loc[index]["Customer ID"] == "2014-MKGMH": 
+            #     print("find!")
+            #     print(len(train))
+            train.append(df.loc[index].values)
+        else: test.append(df.loc[index].values)
+    # train test sort 
+    # print(len(train), len(train[0]))
 
-for row in service.iterrows():
-    if row[0] not in serviceDict.keys():
-        serviceDict[row[0]] = []
+    train, test = np.array(train), np.array(test)
+    for i in range(len(train)):
+        # print(train[:, 0].shape)
+        idx = train[:, 0].tolist().index(trainID_list[i])
+        train[[idx, i], :] = train[[i, idx], :]
+    for i in range(len(test)):
+        idx = test[:, 0].tolist().index(testID_list[i])
+        test[[idx, i], :] = test[[i, idx], :]
+    train = train[:, 1:]
+    test = test[:, 1:]
+    print(train.shape, test.shape)
+    x = np.concatenate((x, train), axis=1)
+    y = np.concatenate((y, test), axis=1)
+    print(x, y)
+    return x, y
 
-    if row[4] == '':
-        serviceDict[row[0]][0] = serviceAverage[4]
-    else:
-        serviceDict[row[0]][0] = row[4]
+train_feature, test_feature =  add_feature(train_feature, test_feature, services)
+train_feature, test_feature = np.array(train_feature), np.array(test_feature)
+print(train_feature.shape, test_feature.shape)
+print(services.tail(5), services.head(5))
 
-    if row[5] == '':
-        serviceDict[row[0]][1] = serviceAverage[5]
-    else:
-        serviceDict[row[0]][1] = row[5]
+df_train = pd.DataFrame(data = train_feature)
+df_test = pd.DataFrame(data = test_feature)
 
-    if row[8] == '':
-        serviceDict[row[0]][2] = serviceAverage[8]
-    else:
-        serviceDict[row[0]][2] = row[8]
+df_train.to_csv('train.csv')
+df_test.to_csv('test.csv')
 
-    if row[12] == '':
-        serviceDict[row[0]][3] = serviceAverage[12]
-    else:
-        serviceDict[row[0]][3] = row[12]
-
-    if row[24] == '':
-        serviceDict[row[0]][4] = serviceAverage[24]
-    else:
-        serviceDict[row[0]][4] = row[24]
-
-    if row[25] == '':
-        serviceDict[row[0]][5] = serviceAverage[25]
-    else:
-        serviceDict[row[0]][5] = row[25]
-
-    if row[26] == '':
-        serviceDict[row[0]][6] = serviceAverage[26]
-    else:
-        serviceDict[row[0]][6] = row[26]
-
-    if row[27] == '':
-        serviceDict[row[0]][7] = serviceAverage[27]
-    else:
-        serviceDict[row[0]][7] = row[27]
-
-    if row[28] == '':
-        serviceDict[row[0]][8] = serviceAverage[28]
-    else:
-        serviceDict[row[0]][8] = row[28]
-
-    if row[29] == '':
-        serviceDict[row[0]][9] = serviceAverage[29]
-    else:
-        serviceDict[row[0]][9] = row[29]
-
-statusType = []
-for row in status.iterrows():
-    if row[0] in serviceDict.keys():
-        if row[1] not in statusType:
-            statusType.append(row[1])
-        serviceDict[row[0]][10] = statusType.index(row[1])
-
-testDict = dict()
-for id in test_IDs.iterrows():
-    if id[0] in serviceDict.keys():
-        testDict[id[0]] = serviceDict[id[0]]
-        serviceDict.pop(id[0])
-
-df_train = pd.DataFrame(data = serviceDict)
-df_test = pd.DataFrame(data = testDict)
-
-df_train.to_csv('extracted.csv')
-df_test.to_csv('testData.csv')
-
-# print(services)
-# new_services = services.dropna()
-# print(new_services)
