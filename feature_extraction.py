@@ -31,8 +31,10 @@ def add_feature(x, y, df):
             tmp = [id]
             tmp.extend([np.nan for i in range(len(df.columns) - 1)])
             df.loc[len(df)] = tmp
+            
     # for discrete col
     str_col = []
+
     # fill NaN
     for column_name in df.columns:
         if column_name == "Customer ID": continue
@@ -48,6 +50,7 @@ def add_feature(x, y, df):
     
     # one hot encoding
     df = pd.get_dummies(df, columns=str_col)
+
     # train test split
     train, test = [], []
     for index in tqdm(range(len(df))):
