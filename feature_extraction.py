@@ -76,9 +76,12 @@ for row in service.iterrows():
     else:
         serviceDict[row[0]][9] = row[29]
 
+statusType = []
 for row in status.iterrows():
     if row[0] in serviceDict.keys():
-        serviceDict[row[0]][10] = row[1]
+        if row[1] not in statusType:
+            statusType.append(row[1])
+        serviceDict[row[0]][10] = statusType.index(row[1])
 
 testDict = dict()
 for id in test_IDs.iterrows():
