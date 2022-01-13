@@ -32,7 +32,7 @@ def save_pred(prediction, file):
 
 def C_svm(train, label, test):
     # set param
-    param = svm_parameter('-s 0 -t 2 -c 1')
+    param = svm_parameter('-s 0 -t 1 -d 5 -g 2 -r 1 -c 10')
     #train
     prob  = svm_problem(label, train)
     m = svm_train(prob, param)
