@@ -123,10 +123,10 @@ def add_label(x, df):
     return x
 
 # add features
-train_feature, test_feature =  add_feature(train_feature, test_feature, services, ["Referred a Friend", ], False)
-train_feature, test_feature =  add_feature(train_feature, test_feature, satisfaction, [], False)
+train_feature, test_feature =  add_feature(train_feature, test_feature, services, ["Referred a Friend", ], True)
+train_feature, test_feature =  add_feature(train_feature, test_feature, satisfaction, [], True)
 # # train_feature, test_feature =  add_feature(train_feature, test_feature, location, [])
-train_feature, test_feature =  add_feature(train_feature, test_feature, demographics, [], False)
+train_feature, test_feature =  add_feature(train_feature, test_feature, demographics, [], True)
 
 # add lebel to train
 train_feature =  add_label(train_feature, status)

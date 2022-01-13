@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import xgboost as xgb
 from xgboost import XGBClassifier
 import csv
 from libsvm.svmutil import *
@@ -42,6 +43,26 @@ def C_svm(train, label, test):
     label, acc, val = svm_predict([], test, m)
     return label
 
+def boost(train, label, test):
+    #param = {
+    #    'booster': 'gbtree',
+    #    'objective': 'multi:softmax',
+    #    'num_class': 6,
+    #    'gamma': 0.1,                  
+    #    'max_depth': 12,               
+    #    'lambda': 2,
+    #    'eta': 0.007,
+    #    'seed': 1000,
+    #}
+    #plst = param.items()
+
+    model = XGBClassifier(n_estimators=100, max_depth = 6, learning_rate= 0.2, objective='multi:softmax', booster='gbtree')
+    model.fit(train, label)
+    #print(train.shape)
+    predicted = model.predict(test)
+    print('score = ', model.score(train, label))
+    return predicted
+    #save_pred(predicted, 'predict.csv')
 
 # Usage
 x_train, y_train = load_data("./features/train.csv", 0)
@@ -81,6 +102,22 @@ for i in tqdm(range(len(x_train_balance))): x_train_nan.append(filter(x_train_di
 for i in tqdm(range(len(x_test))): x_test_nan.append(filter(x_test_dict[i]))
 # print(x_train_nan[0])
 # train
-prediction = C_svm(x_train_nan, y_train_balance, x_test_nan)
+#prediction = C_svm(x_train_nan, y_train_balance, x_test_nan)
+#x_train_nan = np.array(x_train_nan)
+#x_test_nan = np.array(x_test_nan)
+print(x_train_nan)
+print(x_test_nan)
+print(y_train_balance)
+need_delete = []
+for i, v in enumerate(y_train):
+    if np.isnan(v):
+        need_delete.append(i)
+
+x_train = np.delete(x_train, need_delete, axis = 0)
+y_train = np.delete(y_train, need_delete, axis = 0)
+#print(x_train)
+#print(y_train)
+#print(x_test)
+prediction = boost(x_train, y_train, x_test)
 save_pred(prediction, "predict.csv")
 
