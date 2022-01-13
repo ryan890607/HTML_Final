@@ -52,8 +52,8 @@ def add_feature(x, y, df, useless_col ,fillna=True):
                 df[column_name] = df[column_name].fillna(df[column_name].mean())
                 # df[column_name] = df[column_name].fillna(0)
         # one hot encoding
-        df = df.drop(str_col, axis=1)
-        # df = pd.get_dummies(df, columns=str_col)
+        #df = df.drop(str_col, axis=1)
+        df = pd.get_dummies(df, columns=str_col)
     else:
         for column_name in df.columns:
             if column_name == "Customer ID": continue
@@ -63,8 +63,8 @@ def add_feature(x, y, df, useless_col ,fillna=True):
             if isinstance(df.loc[index][column_name], str): str_col.append(column_name)
         # one hot encoding
         # print(df.loc[3])
-        df = df.drop(str_col, axis=1)
-        # df = pd.get_dummies(df, columns=str_col)
+        #df = df.drop(str_col, axis=1)
+        df = pd.get_dummies(df, columns=str_col)
         # print(df.loc[3])
 
     # train test split
