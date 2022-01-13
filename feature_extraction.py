@@ -48,6 +48,7 @@ def add_feature(x, y, df, fillna=True):
             # continuous
             else: 
                 df[column_name] = df[column_name].fillna(df[column_name].mean())
+                # df[column_name] = df[column_name].fillna(0)
         # one hot encoding
         df = pd.get_dummies(df, columns=str_col)
     else:
@@ -117,10 +118,10 @@ def add_label(x, df):
     return x
 
 # add features
-train_feature, test_feature =  add_feature(train_feature, test_feature, services, False)
-train_feature, test_feature =  add_feature(train_feature, test_feature, satisfaction, False)
-# train_feature, test_feature =  add_feature(train_feature, test_feature, location)
-train_feature, test_feature =  add_feature(train_feature, test_feature, demographics, False)
+train_feature, test_feature =  add_feature(train_feature, test_feature, services)
+# train_feature, test_feature =  add_feature(train_feature, test_feature, satisfaction, False)
+# # train_feature, test_feature =  add_feature(train_feature, test_feature, location)
+# train_feature, test_feature =  add_feature(train_feature, test_feature, demographics, False)
 
 # add lebel to train
 train_feature =  add_label(train_feature, status)
