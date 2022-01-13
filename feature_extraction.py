@@ -59,8 +59,9 @@ def add_feature(x, y, df, fillna=True):
             # discrete
             if isinstance(df.loc[index][column_name], str): str_col.append(column_name)
         # one hot encoding
+        print(df.loc[3])
         df = pd.get_dummies(df, columns=str_col)
-        # print(df.tail(5))
+        print(df.loc[3])
 
     # train test split
     train, test = [], []
