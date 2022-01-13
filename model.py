@@ -31,13 +31,13 @@ print(x.shape)
 
 
 
-def save_pred(pred, labels, file):
+def save_pred(prediction, file):
     print('Saving results to {}'.format(file))
     with open(file, 'w') as fp:
         writer = csv.writer(fp)
         writer.writerow(['Customer ID', 'Churn Category'])
-        for i in range(len(pred)):
-            writer.writerow([dataID[i][:12], pred[i]])
+        for i in range(len(prediction)):
+            writer.writerow([testID_list[i], prediction[i]])
 
 
 def xgb():
