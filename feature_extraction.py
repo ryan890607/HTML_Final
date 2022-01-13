@@ -90,7 +90,6 @@ def add_label(x, df):
     for index in tqdm(range(len(df))):
         # print(df.isnull()["Churn Category"][index])
         if not df.isnull()["Churn Category"][index]: df.loc[index]["Churn Category"] = label_idx_list.index(df.loc[index]["Churn Category"])
-    # print(df.tail(5), df.head(5))
 
     # constuct label array
     label = []
