@@ -79,7 +79,7 @@ def filter(data):
     return {k: v for k, v in data.items() if not np.isnan(v)}
 for i in tqdm(range(len(x_train_balance))): x_train_nan.append(filter(x_train_dict[i]))
 for i in tqdm(range(len(x_test))): x_test_nan.append(filter(x_test_dict[i]))
-print(x_train_nan[0])
+# print(x_train_nan[0])
 # train
 prediction = C_svm(x_train_nan, y_train_balance, x_test_nan)
 save_pred(prediction, "predict.csv")
