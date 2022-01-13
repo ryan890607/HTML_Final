@@ -6,6 +6,7 @@ import csv
 from libsvm.svmutil import *
 import random
 from tqdm import tqdm
+from sklearn.model_selection import train_test_split
 # from liblinear.commonutil import evaluations
 
 test_IDs = pd.read_csv("data/Test_IDs.csv")
@@ -56,11 +57,13 @@ def boost(train, label, test):
     #}
     #plst = param.items()
 
-    model = XGBClassifier(n_estimators=100, max_depth = 6, learning_rate= 0.2, objective='multi:softmax', booster='gbtree')
+    train, validData, label, validLabel = train_test_split(train, label, test_size=0.2, random_state=12)
+
+    model = XGBClassifier(n_estimators=100, max_depth = 6, learning_rate= 0.15, objective='multi:softmax', booster='gbtree')
     model.fit(train, label)
     #print(train.shape)
     predicted = model.predict(test)
-    print('score = ', model.score(train, label))
+    print('score = ', model.score(validData, validLabel))
     return predicted
     #save_pred(predicted, 'predict.csv')
 
