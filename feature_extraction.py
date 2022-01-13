@@ -31,7 +31,7 @@ def add_feature(x, y, df):
             tmp = [id]
             tmp.extend([np.nan for i in range(len(df.columns) - 1)])
             df.loc[len(df)] = tmp
-            
+
     # for discrete col
     str_col = []
 
@@ -74,17 +74,54 @@ def add_feature(x, y, df):
     print(train.shape, test.shape)
     x = np.concatenate((x, train), axis=1)
     y = np.concatenate((y, test), axis=1)
-    print(x, y)
+    # print(x, y)
     return x, y
 
+def add_label(x, df):
+    # add data not in df but in train
+    for id in tqdm(trainID_list):
+        if id not in list(df["Customer ID"]): 
+            df.loc[len(df)] = [id, np.nan]
+    # print(df.info)
+
+
+    # transform label into number
+    label_idx_list = ["No Churn", "Competitor", "Dissatisfaction", "Attitude", "Price", "Other"]
+    for index in tqdm(range(len(df))):
+        # print(df.isnull()["Churn Category"][index])
+        if not df.isnull()["Churn Category"][index]: df.loc[index]["Churn Category"] = label_idx_list.index(df.loc[index]["Churn Category"])
+    # print(df.tail(5), df.head(5))
+
+    # constuct label array
+    label = []
+    for index in tqdm(range(len(df))):
+        label.append(df.loc[index].values)
+
+    # train test sort by TRAIN_IDs.csv
+    label = np.array(label)
+    for i in range(len(label)):
+        idx = label[:, 0].tolist().index(trainID_list[i])
+        label[[idx, i], :] = label[[i, idx], :]
+    label = label[:, 1:]
+    print(label.shape)
+    x = np.concatenate((x,  label), axis=1)
+    return x
+
+# add features
 train_feature, test_feature =  add_feature(train_feature, test_feature, services)
-train_feature, test_feature = np.array(train_feature), np.array(test_feature)
+train_feature, test_feature =  add_feature(train_feature, test_feature, satisfaction)
+# train_feature, test_feature =  add_feature(train_feature, test_feature, location)
+train_feature, test_feature =  add_feature(train_feature, test_feature, demographics)
+
+# add lebel to train
+train_feature =  add_label(train_feature, status)
+
 print(train_feature.shape, test_feature.shape)
-print(services.tail(5), services.head(5))
+# print(services.tail(5), services.head(5))
 
 df_train = pd.DataFrame(data = train_feature)
 df_test = pd.DataFrame(data = test_feature)
 
-df_train.to_csv('train.csv')
-df_test.to_csv('test.csv')
+df_train.to_csv('./features/train.csv')
+df_test.to_csv('./features/test.csv')
 
