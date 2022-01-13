@@ -32,7 +32,7 @@ def save_pred(prediction, file):
 
 def C_svm(train, label, test):
     # set param
-    param = svm_parameter('-s 0 -t 1 -d 5 -g 2 -r 1 -c 10 -h 0')
+    param = svm_parameter('-s 0 -t 1 -d 5 -g 2 -r 1 -c 10 -q')
     #train
     prob  = svm_problem(label, train)
     m = svm_train(prob, param)
@@ -53,9 +53,9 @@ for i, j in zip(x_train, y_train):
         x_train_drop.append(i)
         y_train_drop.append(j)
 x_train_drop, y_train_drop = np.array(x_train_drop), np.array(y_train_drop)
-print(x_train_drop.shape, y_train_drop.shape)
+# print(x_train_drop.shape, y_train_drop.shape)
 element_cnt = dict((a, y_train_drop.tolist().count(a)) for a in y_train_drop)
-print(f"element_cnt: {element_cnt}")
+# print(f"element_cnt: {element_cnt}")
 # remove some 0 label (balance data)
 x_train_balance, y_train_balance = [], []
 for i, j in zip(x_train_drop, y_train_drop):
