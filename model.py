@@ -4,6 +4,7 @@ from xgboost import XGBClassifier
 import csv
 from libsvm.svmutil import *
 import random
+from tqdm import tqdm
 # from liblinear.commonutil import evaluations
 
 test_IDs = pd.read_csv("data/Test_IDs.csv")
@@ -28,15 +29,10 @@ def save_pred(prediction, file):
         for i in range(len(prediction)):
             writer.writerow([testID_list[i], int(prediction[i])])
 
-def xgb():
-    x_train, y_train = load_data("./feature/train.csv")
-    model = XGBClassifier(n_estimators = 100, learning_rate = 0.3)
-    model.fit(x_train, y_train)
-    predicted = model.predict(x_train)
 
 def C_svm(train, label, test):
     # set param
-    param = svm_parameter('-s 0 -t 2 -c 0.1')
+    param = svm_parameter('-s 0 -t 2 -c 1')
     #train
     prob  = svm_problem(label, train)
     m = svm_train(prob, param)
@@ -73,6 +69,18 @@ print(f"element_cnt: {element_cnt}")
 # test
 x_test = load_data("./features/test.csv", 1)
 print(x_test.shape)
-prediction = C_svm(x_train_balance, y_train_balance, x_test)
+x_train_dict, x_test_dict = [], []
+# trainsform to dict
+for i in tqdm(range(len(x_train_balance))): x_train_dict.append({j: x_train_balance[i][j] for j in range(len(x_train_balance[i]))})
+for i in tqdm(range(len(x_test))): x_test_dict.append({j: x_test[i][j] for j in range(len(x_test[i]))})
+# remove nan data
+x_train_nan, x_test_nan = [], []
+def filter(data):
+    return {k: v for k, v in data.items() if not np.isnan(v)}
+for i in tqdm(range(len(x_train_balance))): x_train_nan.append(filter(x_train_dict[i]))
+for i in tqdm(range(len(x_test))): x_test_nan.append(filter(x_test_dict[i]))
+print(x_train_nan[0])
+# train
+prediction = C_svm(x_train_nan, y_train_balance, x_test_nan)
 save_pred(prediction, "predict.csv")
 
