@@ -2,8 +2,8 @@ import pandas as pd
 import numpy as np
 from xgboost import XGBClassifier
 import csv
+from libsvm.svmutil import *
 # from liblinear.commonutil import evaluations
-# from libsvm.svmutil import *
 
 test_IDs = pd.read_csv("data/Test_IDs.csv")
 testID_list = list(test_IDs["Customer ID"])

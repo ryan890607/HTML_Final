@@ -19,7 +19,7 @@ train_feature, test_feature = [[] for i in range(len(trainID_list))], [[] for i 
 
 
 # For those df which has userID
-def add_feature(x, y, df):
+def add_feature(x, y, df, fillna=True):
     # add data not in df but in train or test
     for id in tqdm(trainID_list):
         if id not in list(df["Customer ID"]): 
@@ -36,20 +36,30 @@ def add_feature(x, y, df):
     str_col = []
 
     # fill NaN
-    for column_name in df.columns:
-        if column_name == "Customer ID": continue
-        for index in range(len(df)):
-            if not df.isnull()[column_name][index]: break
-        # discrete
-        if isinstance(df.loc[index][column_name], str): 
-            df[column_name] = df[column_name].fillna(df.mode().loc[0][column_name])
-            str_col.append(column_name)
-        # continuous
-        else: 
-            df[column_name] = df[column_name].fillna(df[column_name].mean())
-    
-    # one hot encoding
-    df = pd.get_dummies(df, columns=str_col)
+    if(fillna):
+        for column_name in df.columns:
+            if column_name == "Customer ID": continue
+            for index in range(len(df)):
+                if not df.isnull()[column_name][index]: break
+            # discrete
+            if isinstance(df.loc[index][column_name], str): 
+                df[column_name] = df[column_name].fillna(df.mode().loc[0][column_name])
+                str_col.append(column_name)
+            # continuous
+            else: 
+                df[column_name] = df[column_name].fillna(df[column_name].mean())
+        # one hot encoding
+        df = pd.get_dummies(df, columns=str_col)
+    else:
+        for column_name in df.columns:
+            if column_name == "Customer ID": continue
+            for index in range(len(df)):
+                if not df.isnull()[column_name][index]: break
+            # discrete
+            if isinstance(df.loc[index][column_name], str): str_col.append(column_name)
+        # one hot encoding
+        df = pd.get_dummies(df, columns=str_col)
+        print(df.tail(5))
 
     # train test split
     train, test = [], []
@@ -107,10 +117,10 @@ def add_label(x, df):
     return x
 
 # add features
-train_feature, test_feature =  add_feature(train_feature, test_feature, services)
-train_feature, test_feature =  add_feature(train_feature, test_feature, satisfaction)
+train_feature, test_feature =  add_feature(train_feature, test_feature, services, False)
+train_feature, test_feature =  add_feature(train_feature, test_feature, satisfaction, False)
 # train_feature, test_feature =  add_feature(train_feature, test_feature, location)
-train_feature, test_feature =  add_feature(train_feature, test_feature, demographics)
+train_feature, test_feature =  add_feature(train_feature, test_feature, demographics, False)
 
 # add lebel to train
 train_feature =  add_label(train_feature, status)
