@@ -2,14 +2,31 @@ import pandas as pd
 import numpy as np
 from xgboost import XGBClassifier
 import csv
-from liblinear.commonutil import evaluations
-from libsvm.svmutil import *
+# from liblinear.commonutil import evaluations
+# from libsvm.svmutil import *
 
-def load_data(path):
+def load_data(path, type):
     df = pd.read_csv(path)
-    x, y, id = [], [], []
-    
-    return x, y
+    # print(df.info)
+    datas = df.values
+    datas = datas[:, 1:]
+    if(type == 0): 
+        x, y = datas[:, :-1], datas[:, -1]
+        return x, y
+    else:
+        return datas
+
+
+# Usage
+x, y = load_data("./features/train.csv", 0)
+print(x.shape, y.shape)
+x = load_data("./features/test.csv", 1)
+print(x.shape)
+
+
+
+
+
 
 def save_pred(pred, labels, file):
     print('Saving results to {}'.format(file))
@@ -21,7 +38,7 @@ def save_pred(pred, labels, file):
 
 
 def xgb():
-    x_train, y_train = load_data("./feature/train.dat")
+    x_train, y_train = load_data("./feature/train.csv")
     model = XGBClassifier(n_estimators = 100, learning_rate = 0.3)
     model.fit(x_train, y_train)
     predicted = model.predict(x_train)

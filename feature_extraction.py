@@ -124,3 +124,8 @@ df_test = pd.DataFrame(data = test_feature)
 df_train.to_csv('./features/train.csv')
 df_test.to_csv('./features/test.csv')
 
+# tmp = pd.read_csv("./features/test.csv")
+# datas = tmp.values
+# print(datas[0], test_feature[0])
+# print(tmp.info)
+
