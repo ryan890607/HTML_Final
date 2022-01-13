@@ -5,6 +5,9 @@ import csv
 # from liblinear.commonutil import evaluations
 # from libsvm.svmutil import *
 
+test_IDs = pd.read_csv("data/Test_IDs.csv")
+testID_list = list(test_IDs["Customer ID"])
+
 def load_data(path, type):
     df = pd.read_csv(path)
     # print(df.info)
