@@ -79,7 +79,7 @@ for i, j in zip(x_train, y_train):
 x_train_drop, y_train_drop = np.array(x_train_drop), np.array(y_train_drop)
 # print(x_train_drop.shape, y_train_drop.shape)
 element_cnt = dict((a, y_train_drop.tolist().count(a)) for a in y_train_drop)
-# print(f"element_cnt: {element_cnt}")
+print(f"element_cnt: {element_cnt}")
 # remove some 0 label (balance data)
 x_train_balance, y_train_balance = [], []
 for i, j in zip(x_train_drop, y_train_drop):
@@ -108,9 +108,9 @@ for i in tqdm(range(len(x_test))): x_test_nan.append(filter(x_test_dict[i]))
 #prediction = C_svm(x_train_nan, y_train_balance, x_test_nan)
 #x_train_nan = np.array(x_train_nan)
 #x_test_nan = np.array(x_test_nan)
-print(x_train_nan)
-print(x_test_nan)
-print(y_train_balance)
+# print(x_train_nan)
+# print(x_test_nan)
+# print(y_train_balance)
 need_delete = []
 for i, v in enumerate(y_train):
     if np.isnan(v):

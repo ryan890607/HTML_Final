@@ -19,7 +19,7 @@ train_feature, test_feature = [[] for i in range(len(trainID_list))], [[] for i 
 
 
 # For those df which has userID
-def add_feature(x, y, df, useless_col ,fillna=True):
+def add_feature(x, y, df, useless_col ,fillna=True, str_remain=True):
     # add data not in df but in train or test
     for id in tqdm(trainID_list):
         if id not in list(df["Customer ID"]): 
@@ -51,9 +51,6 @@ def add_feature(x, y, df, useless_col ,fillna=True):
             else: 
                 df[column_name] = df[column_name].fillna(df[column_name].mean())
                 # df[column_name] = df[column_name].fillna(0)
-        # one hot encoding
-        #df = df.drop(str_col, axis=1)
-        df = pd.get_dummies(df, columns=str_col)
     else:
         for column_name in df.columns:
             if column_name == "Customer ID": continue
@@ -61,11 +58,10 @@ def add_feature(x, y, df, useless_col ,fillna=True):
                 if not df.isnull()[column_name][index]: break
             # discrete
             if isinstance(df.loc[index][column_name], str): str_col.append(column_name)
-        # one hot encoding
-        # print(df.loc[3])
-        #df = df.drop(str_col, axis=1)
-        df = pd.get_dummies(df, columns=str_col)
-        # print(df.loc[3])
+
+    # one hot encoding
+    if str_remain: df = pd.get_dummies(df, columns=str_col)
+    else: df = df.drop(str_col, axis=1)
 
     # train test split
     train, test = [], []
@@ -123,10 +119,10 @@ def add_label(x, df):
     return x
 
 # add features
-train_feature, test_feature =  add_feature(train_feature, test_feature, services, ["Referred a Friend", ], False)
-train_feature, test_feature =  add_feature(train_feature, test_feature, satisfaction, [], False)
+train_feature, test_feature =  add_feature(train_feature, test_feature, services, ["Referred a Friend", ], False, True)
+train_feature, test_feature =  add_feature(train_feature, test_feature, satisfaction, [], False, True)
 # # train_feature, test_feature =  add_feature(train_feature, test_feature, location, [])
-train_feature, test_feature =  add_feature(train_feature, test_feature, demographics, [], False)
+train_feature, test_feature =  add_feature(train_feature, test_feature, demographics, [], False, True)
 
 # add lebel to train
 train_feature =  add_label(train_feature, status)
