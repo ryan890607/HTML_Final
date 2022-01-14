@@ -45,6 +45,20 @@ def C_svm(train, label, test):
     label, acc, val = svm_predict([], test, m)
     return label
 
+def boostAggregate(trainPool, labelPool, test):
+    result = [[0, 0, 0, 0, 0, 0] for i in range(len(test))]
+    for i in range(15):
+        model = XGBClassifier(n_estimators=100, max_depth = 6, learning_rate= 0.15, objective='multi:softmax', booster='gbtree', gamma=0.1, min_child_weight=3, num_class=6)
+        model.fit(trainPool[i], labelPool[i])
+        #print(train.shape)
+        predicted = model.predict(test)
+        for j in range(len(test)):
+            result[j][int(predicted[j])] += 1    
+    predicted = []
+    for aggregate in result:
+        predicted.append(aggregate.index(max(aggregate)))
+    return predicted
+
 def boost(train, label, test):
     #param = {
     #    'booster': 'gbtree',
@@ -60,11 +74,26 @@ def boost(train, label, test):
 
     train, validData, label, validLabel = train_test_split(train, label, test_size=0.2, random_state=12)
 
-    model = XGBClassifier(n_estimators=100, max_depth = 6, learning_rate= 0.15, objective='multi:softmax', booster='gbtree', gamma=0.1, min_child_weight=3, num_class=6)
-    model.fit(train, label)
-    #print(train.shape)
-    predicted = model.predict(test)
-    print('score = ', model.score(validData, validLabel))
+    trainPool, labelPool = [], []
+    for i in range(15):
+        curTrain, curLabel = [], []
+        for j in range(1740):
+            index = random.randrange(len(train))
+            curTrain.append(train[index].tolist())
+            curLabel.append(label[index])
+        print(len(curTrain[1]))
+        print(len(curLabel))
+        trainPool.append(curTrain)
+        labelPool.append(curLabel)
+
+    predicted = boostAggregate(trainPool, labelPool, test)
+    validated = boostAggregate(trainPool, labelPool, validData)
+    score = 0
+    for i in range(len(validated)):
+        if validated[i] == validLabel[i]:
+            score += 1
+    score /= len(validated)
+    print('score = ', score)
     return predicted
     #save_pred(predicted, 'predict.csv')
 
