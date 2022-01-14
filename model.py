@@ -125,6 +125,7 @@ y_train = np.delete(y_train, need_delete, axis = 0)
 prediction = boost(x_train_balance, y_train_balance, x_test)
 save_pred(prediction, "predict.csv")
 
-tmp1 = [i for j in range(200) for i in range(6)]
-tmp2 = [i for j in range(600) for i in range(2)]
+tmp1 = [i for i in range(6) for j in range(200)]
+tmp2 = [i for i in range(2) for j in range(600)]
+print(tmp1, tmp2)
 print(f1_score(tmp1, tmp2, average='micro'))
