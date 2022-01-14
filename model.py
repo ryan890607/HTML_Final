@@ -6,6 +6,7 @@ import csv
 from libsvm.svmutil import *
 import random
 from tqdm import tqdm
+from sklearn.metrics import f1_score
 from sklearn.model_selection import train_test_split
 # from liblinear.commonutil import evaluations
 
@@ -121,6 +122,9 @@ y_train = np.delete(y_train, need_delete, axis = 0)
 #print(x_train)
 #print(y_train)
 #print(x_test)
-prediction = boost(x_train, y_train, x_test)
+prediction = boost(x_train_balance, y_train_balance, x_test)
 save_pred(prediction, "predict.csv")
 
+tmp1 = [i for j in range(200) for i in range(6)]
+tmp2 = [i for j in range(600) for i in range(2)]
+print(f1_score(tmp1, tmp2, average='micro'))
