@@ -16,6 +16,15 @@ test_IDs = pd.read_csv("data/Test_IDs.csv")
 trainID_list, testID_list = list(train_IDs["Customer ID"]), list(test_IDs["Customer ID"])
 # print(trainID_list, testID_list)
 train_feature, test_feature = [[] for i in range(len(trainID_list))], [[] for i in range(len(testID_list))]
+zipcode_list, population_list = population.values[:, 1], population.values[:, 2]
+zipcode_population_list = []
+for zipcode in list(location["Zip Code"]):
+    idx = np.where(zipcode_list == zipcode)
+    if len(idx[0]) == 0: zipcode_population_list.append(np.nan)
+    else: zipcode_population_list.append(population_list[idx[0][0]])
+# print(zipcode_population_list)
+location["population"] = zipcode_population_list
+# print(location.info)
 
 
 # For those df which has userID
