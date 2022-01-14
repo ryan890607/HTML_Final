@@ -60,7 +60,7 @@ def boost(train, label, test):
 
     train, validData, label, validLabel = train_test_split(train, label, test_size=0.2, random_state=12)
 
-    model = XGBClassifier(n_estimators=100, max_depth = 6, learning_rate= 0.15, objective='multi:softmax', booster='gbtree')
+    model = XGBClassifier(n_estimators=100, max_depth = 6, learning_rate= 0.15, objective='multi:softmax', booster='gbtree', gamma=0.1, min_child_weight=3, num_class=6)
     model.fit(train, label)
     #print(train.shape)
     predicted = model.predict(test)
@@ -125,7 +125,7 @@ y_train = np.delete(y_train, need_delete, axis = 0)
 prediction = boost(x_train_balance, y_train_balance, x_test)
 save_pred(prediction, "predict.csv")
 
-tmp1 = [i for i in range(6) for j in range(200)]
-tmp2 = [i for i in range(2) for j in range(600)]
-print(tmp1, tmp2)
-print(f1_score(tmp1, tmp2, average='micro'))
+#tmp1 = [i for i in range(6) for j in range(200)]
+#tmp2 = [i for i in range(2) for j in range(600)]
+#print(tmp1, tmp2)
+#print(f1_score(tmp1, tmp2, average='micro'))
