@@ -8,6 +8,7 @@ import random
 from tqdm import tqdm
 from sklearn.metrics import f1_score
 from sklearn.model_selection import train_test_split
+from liblinear.liblinearutil import *
 # from liblinear.commonutil import evaluations
 
 test_IDs = pd.read_csv("data/Test_IDs.csv")
@@ -44,6 +45,16 @@ def C_svm(train, label, test):
     print(E_in)
     label, acc, val = svm_predict([], test, m)
     return label
+
+def logistic(trainData, label, test):
+    # set param
+    trainData, validData, label, validLabel = train_test_split(trainData, label, test_size=0.2, random_state=12)
+    #train
+    model = train(label, trainData, '-s 0 -c 10 -e 0.01')
+    trash, acc, val = predict(validLabel, validData, model)
+    print('val score = ', acc[0])
+    predicted, acc, val = predict([], test, model)
+    return predicted
 
 def boostAggregate(trainPool, labelPool, test):
     result = [[0, 0, 0, 0, 0, 0] for i in range(len(test))]
@@ -152,6 +163,7 @@ y_train = np.delete(y_train, need_delete, axis = 0)
 #print(y_train)
 #print(x_test)
 prediction = boost(x_train_balance, y_train_balance, x_test)
+#prediction = logistic(x_train, y_train, x_test)
 save_pred(prediction, "predict.csv")
 
 #tmp1 = [i for i in range(6) for j in range(200)]
